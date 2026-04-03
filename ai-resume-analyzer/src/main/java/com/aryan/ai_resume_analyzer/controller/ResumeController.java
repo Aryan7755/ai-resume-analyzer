@@ -3,6 +3,7 @@ package com.aryan.ai_resume_analyzer.controller;
 import com.aryan.ai_resume_analyzer.model.Resume;
 import com.aryan.ai_resume_analyzer.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,18 +21,14 @@ public class ResumeController {
     private ResumeService resumeService;
 
     @PostMapping("/upload")
-    public Map<String, Object> uploadResume(@RequestParam("file") MultipartFile file) {
-        try {
-            Resume savedResume = resumeService.saveResume(file);
+    public ResponseEntity<?> uploadResume(@RequestParam("file") MultipartFile file) {
+        // The Controller only handles the HTTP request/response
+        Resume savedResume = resumeService.uploadAndSave(file);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", savedResume.getId());
-            response.put("fileName", savedResume.getFileName());
-
-            return response;
-
-        } catch (Exception e) {
-            throw new RuntimeException("File upload failed");
-        }
+        // Return the clean JSON structure requested in your goal
+        return ResponseEntity.ok(Map.of(
+                "id", savedResume.getId(),
+                "filePath", savedResume.getFilePath()
+        ));
     }
 }

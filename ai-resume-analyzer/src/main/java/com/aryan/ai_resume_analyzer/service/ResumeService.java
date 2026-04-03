@@ -13,18 +13,20 @@ import java.time.LocalDateTime;
 public class ResumeService {
     @Autowired
     private ResumeRepository resumeRepository;
-    public Resume saveResume(MultipartFile file) throws IOException {
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    public Resume uploadAndSave(MultipartFile file) {
+        // 1. Save to physical disk using our helper service
+        String filePath = fileStorageService.storeFile(file);
+
+        // 2. Create the Entity and set metadata
         Resume resume = new Resume();
-
-        // Extract details
         resume.setFileName(file.getOriginalFilename());
-        resume.setFileType(file.getContentType());
-        resume.setFileData(file.getBytes());
+        resume.setFilePath(filePath);
+        resume.setStatus("UPLOADED");
 
-        // Timestamp
-        resume.setUploadedAt(LocalDateTime.now());
-
-        // Save to DB
+        // 3. Save to MySQL and return the object
         return resumeRepository.save(resume);
     }
 }

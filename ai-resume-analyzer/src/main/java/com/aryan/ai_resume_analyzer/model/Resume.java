@@ -20,7 +20,7 @@ public class Resume {
     private String fileType;
 
     private String filePath;
-
+    @Column(length = 20)
     private String status;
 
     @CreationTimestamp
