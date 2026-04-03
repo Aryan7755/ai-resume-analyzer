@@ -6,9 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-@Data
 @Entity
 @Table(name = "resumes")
+@Data
 public class Resume {
 
     @Id
@@ -19,17 +19,12 @@ public class Resume {
 
     private String fileType;
 
+    private String filePath;
+
+    private String status;
+
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime uploadedAt;
-
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] fileData;
-
-    // No-args constructor (required by JPA)
-    public Resume() {
-    }
-
-
 }
+
+
