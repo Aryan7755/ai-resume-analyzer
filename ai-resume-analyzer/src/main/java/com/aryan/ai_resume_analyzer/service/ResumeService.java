@@ -15,16 +15,25 @@ public class ResumeService {
     private ResumeRepository resumeRepository;
     @Autowired
     private FileStorageService fileStorageService;
+    @Autowired
+    private ParserService parserService;
 
     public Resume uploadAndSave(MultipartFile file) {
         // 1. Save to physical disk using our helper service
         String filePath = fileStorageService.storeFile(file);
 
-        // 2. Create the Entity and set metadata
+        String rawText = parserService.parsePdf(filePath);
+
+        System.out.println("========================================");
+        System.out.println("EXTRACTED TEXT FOR: " + file.getOriginalFilename());
+        System.out.println("----------------------------------------");
+        System.out.println(rawText);
+        System.out.println("========================================");
+
         Resume resume = new Resume();
         resume.setFileName(file.getOriginalFilename());
         resume.setFilePath(filePath);
-        resume.setStatus("UPLOADED");
+        resume.setStatus("EXTRACTED");
 
         // 3. Save to MySQL and return the object
         return resumeRepository.save(resume);
