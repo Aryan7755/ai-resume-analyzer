@@ -4,14 +4,14 @@ import com.aryan.ai_resume_analyzer.enums.Status;
 import com.aryan.ai_resume_analyzer.model.Resume;
 import com.aryan.ai_resume_analyzer.repository.ResumeRepository;
 import com.aryan.ai_resume_analyzer.service.StorageService;
+import com.aryan.ai_resume_analyzer.service.TextExtractionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -21,9 +21,16 @@ public class ResumeController {
     private final StorageService storageService;
     @Autowired
     private final ResumeRepository resumeRepository;
+    @Autowired
+    private final TextExtractionService extractionService;
+
+    @GetMapping
+    public ResponseEntity<List<Resume>> getAllResumes(){
+        return ResponseEntity.ok(resumeRepository.findAll());
+    }
 
     @PostMapping("/upload")
-    private ResponseEntity<String> uploadResume(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<String> uploadResume(@RequestParam("file") MultipartFile file){
         try {
             if(file.isEmpty()){
                 return ResponseEntity.badRequest().body("Please upload a file.");
@@ -46,6 +53,19 @@ public class ResumeController {
             resume.setFilePath("uploads/" + uniqueName);
             resume.setStatus(Status.UPLOADED);
             //save to mysql db
+            resumeRepository.save(resume);
+            String absolutePath = "uploads/"+uniqueName;
+            String extractedContent = extractionService.extractText(absolutePath);
+            resume.setRawText(extractedContent);
+            if (extractedContent.equals("ERROR_ENCRYPTED")) {
+                resume.setStatus(Status.ERROR_ENCRYPTED);
+            } else if (extractedContent.equals("ERROR_IMAGE_ONLY")) {
+                resume.setStatus(Status.ERROR_IMAGE_ONLY);
+            } else if (extractedContent.startsWith("EXTRACTION_ERROR")) {
+                resume.setStatus(Status.ERROR);
+            } else {
+                resume.setStatus(Status.EXTRACTED);
+            }
             resumeRepository.save(resume);
             return ResponseEntity.ok("Resume uploaded successfully: " + uniqueName);
         }
