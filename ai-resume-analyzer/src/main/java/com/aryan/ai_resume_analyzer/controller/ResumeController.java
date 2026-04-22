@@ -34,6 +34,19 @@ public class ResumeController {
     public ResponseEntity<List<Resume>> getAllResumes(){
         return ResponseEntity.ok(resumeRepository.findAll());
     }
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> downloadResume(@PathVariable Long id) throws Exception {
+        Resume resume = resumeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
+
+        Path path = Paths.get(resume.getFilePath()); // Locates the file in /uploads
+        Resource resource = new UrlResource(path.toUri());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resume.getFileName() + "\"")
+                .body(resource);
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadResume(@RequestParam("file") MultipartFile file){
