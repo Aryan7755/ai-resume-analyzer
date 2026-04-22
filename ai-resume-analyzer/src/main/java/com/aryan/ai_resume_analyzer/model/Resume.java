@@ -30,4 +30,9 @@ public class Resume {
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime uploadedAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
+    private boolean deleted = false;
 }
