@@ -94,5 +94,15 @@ public class ResumeController {
             return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
         }
     }
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<String> softDeleteResume(@PathVariable Long id) {
+        Resume resume = resumeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
+
+        resume.setDeleted(true); // This is the "Soft" part
+        resumeRepository.save(resume);
+
+        return ResponseEntity.ok("Resume removed from history");
+    }
 
 }

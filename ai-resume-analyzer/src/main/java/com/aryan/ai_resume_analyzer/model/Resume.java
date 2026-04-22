@@ -1,6 +1,7 @@
 package com.aryan.ai_resume_analyzer.model;
 
 import com.aryan.ai_resume_analyzer.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
