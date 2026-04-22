@@ -30,9 +30,10 @@ public class ResumeController {
     @Autowired
     private final TextExtractionService extractionService;
 
-    @GetMapping
-    public ResponseEntity<List<Resume>> getAllResumes(){
-        return ResponseEntity.ok(resumeRepository.findAll());
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<Resume>> getUserHistory(@PathVariable Long userId) {
+        List<Resume> history = resumeRepository.findByUserIdAndDeletedFalse(userId);
+        return ResponseEntity.ok(history);
     }
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> downloadResume(@PathVariable Long id) throws Exception {
