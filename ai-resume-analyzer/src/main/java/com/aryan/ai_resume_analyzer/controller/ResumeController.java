@@ -59,7 +59,7 @@ public class ResumeController {
             if(contentType==null || (!contentType.equals("application/pdf") &&
                     !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))) {
                 return ResponseEntity.badRequest().body("Only PDF and DOCX files are allowed.");
-            };
+            }
             long maxSize = 5 * 1024 * 1024; // 5MB in bytes
             if (file.getSize() > maxSize) {
                 return ResponseEntity.badRequest().body("File size exceeds 5MB limit.");
